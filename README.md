@@ -1,3 +1,50 @@
+<!-- ─────────── DELETE FROM HERE once you have created your project ─────────── -->
+
+# project-skeleton
+
+A GitHub template that gives a new project its **process** on the first commit,
+and deliberately nothing else: no framework, no package manager, no lockfile,
+no linter. Those arrive when you pick a stack. This arrives before you do.
+
+It was extracted from a real repository after that repository had spent a year
+paying for the alternatives, so most of what is here is a rule with a reason
+attached rather than a preference.
+
+## What you get
+
+| Path | Holds |
+| --- | --- |
+| `specs/tasks/` | a task stack — one file per task, `active/` then `done/`, no index to regenerate and nothing two branches can collide on |
+| `.claude/CLAUDE.md` | a five-rule working agreement, plus named headings that tooling reads for project facts |
+| `scripts/check-pr-title.sh` | a Conventional Commits gate in POSIX shell — no Node, runs anywhere, with its own table test |
+| `.github/workflows/pr-title.yml` | that gate in CI, on the `edited` trigger most setups forget |
+| `docs/adr/` | architecture decision records, starting with the ADR that says to write them |
+
+Each carries the reasoning for its shape. `specs/tasks/README.md` explains why
+the task id is a branch slug and not a counter, and why two files would have
+been the wrong layout — both answers cost real time to learn.
+
+## Using it
+
+```sh
+gh repo create my-thing --template kkucherenkov/project-skeleton --private --clone
+cd my-thing
+grep -rn '<[A-Z_]\+>' .     # every spot you need to fill
+```
+
+Then set branch protection to require `PR title (conventional commit)`.
+
+## Why there is no tooling in it
+
+A skeleton that ships `package.json` has chosen Node for you. This one is
+installed into projects whose stack is not decided yet — sometimes into
+projects that will never have a package manager at all — so the one piece of
+logic it contains is written in the language every machine already has.
+
+MIT licensed. Issues and pull requests welcome.
+
+<!-- ─────────── DELETE TO HERE ─────────── -->
+
 # <PROJECT>
 
 <SUMMARY>
