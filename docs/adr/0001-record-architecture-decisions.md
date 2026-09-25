@@ -1,7 +1,7 @@
 # 1. Record architecture decisions
 
-- Status: accepted
-- Date: <DATE>
+- **Status:** accepted
+- **Date:** <DATE>
 
 ## Context
 
