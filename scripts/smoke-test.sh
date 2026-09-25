@@ -99,14 +99,26 @@ check "pr-title workflow present"    test -f .github/workflows/pr-title.yml
 check       "title gate accepts a valid subject" sh scripts/check-pr-title.sh 'feat: works in a fresh clone'
 check_fails "title gate rejects an invalid subject" sh scripts/check-pr-title.sh 'nope'
 
-# Placeholders must still be present and findable, so the person filling them
-# cannot miss one. A skeleton with none has been filled already, which means
-# the template was published from a filled copy.
-found=$(grep -rno '<[A-Z_]\+>' .claude/CLAUDE.md README.md | wc -l | tr -d ' ')
-if [ "$found" -ge 3 ]; then
-  printf 'ok   placeholders present and greppable (%s)\n' "$found"
+# Placeholders must survive publication, so the person filling them cannot miss
+# one. Asserted BY NAME across the whole tree, not by counting two files: a
+# threshold survives the loss of any individual placeholder, changes whenever
+# the template gains a field, and skips `docs/adr/0001` entirely.
+for ph in '<PROJECT>' '<LANG>' '<SUMMARY>' '<DATE>'; do
+  check "placeholder $ph survived publication" \
+    grep -rqF "$ph" --exclude-dir=.git .
+done
+
+# The other half: nothing may match the setup grep that is NOT a placeholder,
+# or a person following the documented command is sent to edit prose. This is
+# not hypothetical — a sentence explaining the placeholder convention matched
+# its own description once.
+unexpected=$(grep -rho '<[A-Z_]\+>' --exclude-dir=.git . \
+  | sort -u \
+  | grep -vxE '<PROJECT>|<LANG>|<SUMMARY>|<DATE>' || true)
+if [ -z "$unexpected" ]; then
+  printf 'ok   the setup grep matches placeholders and nothing else\n'
 else
-  printf 'FAIL placeholders present and greppable (%s, expected at least 3)\n' "$found" >&2
+  printf 'FAIL the setup grep also matches: %s\n' "$(printf '%s' "$unexpected" | tr '\n' ' ')" >&2
   failures=$((failures + 1))
 fi
 

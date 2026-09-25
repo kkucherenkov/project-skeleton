@@ -93,14 +93,36 @@ expect_c 0 "$multibyte_at_limit"
 expect   1 "$multibyte_over_limit"
 expect_c 1 "$multibyte_over_limit"
 
-# Shell metacharacters are text, never code. If the gate executed this, the
-# marker file would exist.
-rm -f /tmp/check-pr-title-pwned
-expect 1 'oops: $(touch /tmp/check-pr-title-pwned)'
-if [ -f /tmp/check-pr-title-pwned ]; then
-  echo 'FAIL the gate executed its input' >&2
-  failures=$((failures + 1))
-fi
+# Shell metacharacters are text, never code.
+#
+# The type has to be VALID. With `oops:` the pattern rejects the title before
+# anything else runs, so the case proves the regex works and says nothing about
+# whether an accepted title is ever evaluated — which is the property being
+# asserted. Each payload below is carried by a title the gate ACCEPTS.
+#
+# The marker lives in a private directory rather than at a fixed /tmp path: a
+# leftover file from another user, or another run, would otherwise report "the
+# gate executed its input" when it did no such thing.
+marker_dir=$(mktemp -d)
+trap 'rm -rf "$marker_dir"' EXIT
+marker="$marker_dir/p"
+
+check_not_executed() {
+  desc=$1
+  title=$2
+  want=$3
+  rm -f "$marker"
+  expect "$want" "$title"
+  if [ -e "$marker" ]; then
+    printf 'FAIL the gate executed its input (%s)\n' "$desc" >&2
+    failures=$((failures + 1))
+  fi
+}
+
+check_not_executed 'command substitution'  "feat: add \$(touch $marker) support" 0
+check_not_executed 'backticks'             "feat: add \`touch $marker\` support" 0
+check_not_executed 'statement separator'   "feat: x; touch $marker" 0
+check_not_executed 'rejected before match' "oops: \$(touch $marker)" 1
 
 # Called wrong
 expect 2 ''

@@ -23,6 +23,15 @@ Then create your own entry from `specs/tasks/templates/feature.md`, named
 sh scripts/check-pr-title.sh "feat(web): add the calendar view"
 ```
 
+  The rules it enforces: one of `feat`, `fix`, `chore`, `docs`, `refactor`,
+  `test`, `perf`, `ci`, `build`, `style`, `revert`; an optional scope in
+  parentheses with no restriction on its characters; an optional `!` for a
+  breaking change; then `: ` and a description that does not start with a
+  space. **The whole subject is at most 72 characters** — characters, not
+  bytes, so an em dash costs one. Commitlint's own default is 100; this is
+  shorter because the subject becomes a commit message on the default branch,
+  where `git log --oneline` truncates.
+
 - The commit body says **why**. What changed is what `git diff` is for.
 
 ## Finishing
