@@ -2,8 +2,9 @@
 > **This is `project-skeleton`'s own README.** If you created this repository
 > from the template, delete everything above the horizontal rule below, then:
 >
-> 1. `grep -rn '<[A-Z_]\+>' . --exclude-dir=.git` — every placeholder to fill.
-> 2. Replace `LICENSE` with your own. The one here covers the template.
+> 1. Delete `scripts/smoke-test.sh` — it tests the template, not your project.
+> 2. `grep -rn '<[A-Z_]\+>' . --exclude-dir=.git` — every placeholder to fill.
+> 3. Replace `LICENSE` with your own. The one here covers the template.
 
 # project-skeleton
 
@@ -72,9 +73,12 @@ layer and nothing else — no application code, no stack, no dependencies:
 
 ## First steps in a new project
 
-1. Fill the placeholders: `grep -rn '<[A-Z_]\+>' . --exclude-dir=.git`.
-2. Replace `LICENSE` with your own, and delete `scripts/smoke-test.sh` — it
-   tests the template, not this project.
+1. Delete `scripts/smoke-test.sh` — it tests the template, not this project,
+   and it carries the placeholder names as assertion data, so the grep in the
+   next step would otherwise send you into a file you have not been told to
+   remove yet.
+2. Fill the placeholders: `grep -rn '<[A-Z_]\+>' . --exclude-dir=.git`, and
+   replace `LICENSE` with your own.
 3. Set branch protection to require the checks named
    `PR title (conventional commit)` and `Shell tests`, and add any further
    required checks to `## Quality gates` in `.claude/CLAUDE.md` using the
