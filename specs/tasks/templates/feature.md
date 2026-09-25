@@ -6,7 +6,7 @@ branch slug — `T-YYYY-MM-DD-<branch-slug>`, no counter to allocate; the format
 and why it is not a number are in [`specs/tasks/README.md`](../README.md).
 
 ```md
-## T-YYYY-MM-DD-{branch-slug} — {short title, verb-led}
+## T-YYYY-MM-DD-<branch-slug> — {short title, verb-led}
 
 - Created: YYYY-MM-DD
 - Owner: claude | @handle
@@ -22,6 +22,14 @@ and why it is not a number are in [`specs/tasks/README.md`](../README.md).
 - Status: in-progress | blocked | paused
 - Blockers: —
 ```
+
+Two kinds of placeholder appear above, and the difference is deliberate:
+`<angle>` marks a part of a fixed format — the id is literally
+`T-`, a date, and your branch slug — while `{brace}` marks a field you fill
+with your own words, with the instruction for it inside the braces. Neither is
+angle brackets around capitals, which is reserved for the values filled once
+when the project is set up and is what `grep -rn '<[A-Z_]\+>' .` looks for —
+spelling the form out here literally would make this sentence one of its hits.
 
 ## Field rules
 
