@@ -5,7 +5,7 @@
 Read `specs/tasks/active/`. That is the current stack of work:
 
 ```sh
-cat specs/tasks/active/*.md
+find specs/tasks/active -name '*.md' -exec cat {} +
 ```
 
 Then create your own entry from `specs/tasks/templates/feature.md`, named

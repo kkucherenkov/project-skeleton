@@ -26,6 +26,14 @@ expect 0 'revert: feat(api): add pagination'
 expect 0 'chore(deps): bump node to 22'
 expect 0 'docs: explain the sync model'
 
+# Accepted: the scope is unconstrained. Conventional Commits does not restrict
+# its characters, and a project whose packages are named `UI` or whose scope is
+# `Dockerfile` must not be told its correct title is wrong.
+expect 0 'fix(API): uppercase scope'
+expect 0 'feat(Button): component scope'
+expect 0 'chore(Dockerfile): bump the base image'
+expect 0 'feat(api,web): two scopes'
+
 # Rejected: unknown type
 expect 1 'feature: add calendar view'
 expect 1 'Add calendar view'
@@ -34,6 +42,13 @@ expect 1 'FEAT: add calendar view'
 # Rejected: no description
 expect 1 'feat:'
 expect 1 'feat: '
+expect 1 'feat:  '
+expect 1 'feat:add calendar view'
+
+# Rejected: a title is one line. `grep` anchors ^ to a LINE, so a multi-line
+# string whose SECOND line is conventional would otherwise be accepted whole.
+expect 1 "$(printf 'Merge pull request #12\nfeat: sneaky')"
+expect 1 "$(printf 'feat: fine\nrm -rf /')"
 
 # Length boundary. Build the strings instead of typing them: a literal run of
 # 66 versus 67 'a' characters is a transcription risk, and a miscounted
@@ -50,6 +65,33 @@ pad() {
 
 expect 0 "feat: $(pad 66)"   # 'feat: ' is 6 chars, so this is exactly 72
 expect 1 "feat: $(pad 67)"   # 73, one over
+
+# The limit is in CHARACTERS, not bytes, and it has to hold under the shell CI
+# actually uses. `/bin/sh` on a GitHub runner is dash, whose ${#var} counts
+# bytes; the same expression under bash in a UTF-8 locale counts characters.
+# So these cases are pinned to LC_ALL=C, which reproduces the byte-counting
+# behaviour on any shell. Without the pin they pass locally and fail in CI —
+# which is precisely the bug.
+expect_c() {
+  want=$1
+  title=$2
+  LC_ALL=C sh "$subject" "$title" >/dev/null 2>&1
+  got=$?
+  if [ "$got" -ne "$want" ]; then
+    printf 'FAIL (LC_ALL=C) want=%s got=%s title=%s\n' "$want" "$got" "$title" >&2
+    failures=$((failures + 1))
+  fi
+}
+
+# 'feat: ' + 63 ASCII + 3 em dashes = 72 characters, 78 bytes.
+multibyte_at_limit="feat: $(pad 63)———"
+# One more ASCII character: 73 characters, 79 bytes.
+multibyte_over_limit="feat: $(pad 64)———"
+
+expect   0 "$multibyte_at_limit"
+expect_c 0 "$multibyte_at_limit"
+expect   1 "$multibyte_over_limit"
+expect_c 1 "$multibyte_over_limit"
 
 # Shell metacharacters are text, never code. If the gate executed this, the
 # marker file would exist.

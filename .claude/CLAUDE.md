@@ -65,8 +65,16 @@ One file per task: `specs/tasks/active/<id>.md` while it runs,
 `specs/tasks/done/<id>.md` once it ships. Format and rationale in
 [`specs/tasks/README.md`](../specs/tasks/README.md).
 
-**Session start: read `specs/tasks/active/` first** —
-`cat specs/tasks/active/*.md`.
+**Session start: read `specs/tasks/active/` first:**
+
+```sh
+find specs/tasks/active -name '*.md' -exec cat {} +
+```
+
+Not `cat specs/tasks/active/*.md` — with an empty stack that glob matches
+nothing, which is an error in `sh` and refuses to run at all in `zsh`. The
+first command of every session should not fail on the ordinary case of having
+nothing in flight.
 
 ## Quality gates
 
@@ -77,6 +85,7 @@ that counts checks reads an unstarted one as passing. Compare against these
 names.
 
 - `PR title (conventional commit)`
+- `Shell tests`
 
 ## Never do
 

@@ -6,6 +6,20 @@
 # under test is what `gh repo create --template` actually hands a person.
 set -eu
 
+# This script tests the template. `gh repo create --template` copies every
+# tracked file, so it lands in each repository made from the skeleton, where it
+# has nothing to test and would create and delete repositories in that owner's
+# account against someone else's template. Refuse rather than do that.
+origin=$(git config --get remote.origin.url 2>/dev/null || true)
+case ${origin:-} in
+  *project-skeleton*) : ;;
+  *)
+    echo 'error: this script tests the project-skeleton template itself.' >&2
+    echo 'In a repository created from it there is nothing to test — delete this file.' >&2
+    exit 2
+    ;;
+esac
+
 name="skeleton-smoke-$(date +%s)"
 owner=$(gh api user --jq .login)
 work=$(mktemp -d)
